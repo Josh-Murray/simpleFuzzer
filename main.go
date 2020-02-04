@@ -2,9 +2,14 @@ package main
 
 import(
 	"fmt"
+	"math/rand"
+	"time"
 )
+var rng *rand.Rand
 func main(){
 	config := loadConfig()
-	exp := generateExpression(config.Log, config.Length, config.Trials, config.Start, config.Grammar)
-	fmt.Printf("expression = %s\n", exp)
+	rng = rand.New(rand.NewSource(time.Now().Unix()))
+	seeds := generateSeeds(config)
+	seeds = mutateSeeds(config, seeds)
+	fmt.Println(seeds)
 }

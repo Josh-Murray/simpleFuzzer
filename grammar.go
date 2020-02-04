@@ -3,9 +3,7 @@ package main
 import(
 	"fmt"
 	"regexp"
-	"math/rand"
 	"strings"
-	"time"
 )
 // re to find the nonTerminal elements
 var re = regexp.MustCompile(`(<[^<> ]*>)`)
@@ -15,27 +13,23 @@ func nonTerminal(subSet string) []string{
 	return re.FindAllString(subSet, -1)
 }
 
-func generateExpression(log bool, maxLength int, maxTrials int, start string, grammar map[string][]string) string {
-	rand.Seed(time.Now().Unix())
+func generateExpression(Start string, Grammar map[string][]string, Length int, Trials int) string {
 	trial := 0
-	term := start
+	term := Start
 	for len(nonTerminal(term)) > 0{
 		// Replace a random expression from term with a random expansion from grammar
-		choice := nonTerminal(term)[rand.Intn(len(nonTerminal(term)))]
-		expansions := grammar[choice]
+		choice := nonTerminal(term)[rng.Intn(len(nonTerminal(term)))]
+		expansions := Grammar[choice]
 		// Could be improved by enforcing expansions choice to have < maxLength nonTerminals, instead of current trial and error approach
-		expansionChoice := expansions[rand.Intn(len(expansions))]
+		expansionChoice := expansions[rng.Intn(len(expansions))]
 		temp := strings.Replace(term, choice, expansionChoice,1)
 		// Check if temp follows constraints
-		if len(nonTerminal(temp)) < maxLength{
+		if len(nonTerminal(temp)) <Length{
 			term = temp
 			trial = 0
-			if log{
-				fmt.Printf("[Log] expression = %s (%s --> %s) \n", term, choice, expansionChoice)
-			}
 		}else{
 			trial ++
-			if trial > maxTrials{
+			if trial > Trials{
 				fmt.Println("[ERROR] Reached max trial length")
 				break
 			}
@@ -43,4 +37,24 @@ func generateExpression(log bool, maxLength int, maxTrials int, start string, gr
 
 	}
 	return term
+}
+
+func generateSeeds(conf Config) []string{
+	if conf.Log{
+		fmt.Println("[Log] --- Generating Seeds ---")
+	}
+	var seeds [] string
+	var newSeed string
+	for i:=0; i < conf.NumSeeds; i++{
+		newSeed = generateExpression(conf.Start, conf.Grammar, conf.Length, conf.Trials)
+		if conf.Log{
+			fmt.Println("[Log] Generated seed: " + newSeed)
+		}
+		seeds = append(seeds, newSeed)
+	}
+	if conf.Log{
+		fmt.Println("[Log] --- Finished generating seeds ---")
+		fmt.Println("[Log] Seeds: " , seeds)
+	}
+	return seeds
 }

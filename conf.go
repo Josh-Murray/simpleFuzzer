@@ -10,12 +10,10 @@ type Config struct{
 	Trials int
 	Start string
 	Grammar map[string] []string
+	NumMutations int
+	NumSeeds int
 }
 func loadDefaults() Config{
-	 log := true
-	 length := 10
-	 trials := 100
-	 start := "<start>"
 	 grammar := map[string][]string{
 		"<start>":	{"<expr>"},
 		"<expr>":	{"<term> + <expr>", "<term> - <expr>", "<term>"},
@@ -24,8 +22,9 @@ func loadDefaults() Config{
 		"<integer>":	{"<digit><integer>", "<digit>"},
 		"<digit>":	{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"},
 	}
-	return Config{log, length, trials, start, grammar}
+	return Config{true, 10, 100, "<start>", grammar, 3, 5}
 }
+// TODO make this better
 func checkConf(conf Config) (bool, string){
 	// unclear why there isn't a trivial way to ensure missing fields throw an error but here we are
 	if conf.Trials == 0 {
@@ -34,9 +33,16 @@ func checkConf(conf Config) (bool, string){
 	if conf.Length == 0{
 		return false, "Length not found or 0"
 	}
+	if conf.NumMutations == 0{
+		return false, "NumMutations not found or 0"
+	}
+	if conf.NumSeeds == 0{
+		return false, "NumMumSeeds not found or 0"
+	}
 	if _, ok := conf.Grammar[conf.Start]; !ok {
 		return false, "Start not in grammar"
 	}
+	// TODO: implement something that checks a grammar is valid
 	return true, ""
 }
 func loadConfig() Config{

@@ -1,8 +1,10 @@
 {
-	"Log": false,
+	"Log": true,
 	"Trials": 50,
-	"Length": 5,
+	"Length": 3,
 	"Start" : "<start>",
+	"NumMutations" : 3,
+	"NumSeeds" : 5,
 	"Grammar" : {
 		"<start>":	["<expr>"],
 		"<expr>":	["<term> + <expr>", "<term> - <expr>", "<term>"],
