@@ -1,59 +1,43 @@
 package main
-
 import (
 	"fmt"
-	"strings"
+	"sync"
+	"encoding/hex"
+	"os/exec"
 )
-// Mutations
-func insertRandomChar(s string) string{
-	index := rng.Intn(len(s))
-	char := rune(33 + rng.Intn(94))
-	s = s[:index] + string(char) + s[index:]
-	return s
-}
 
-func deleteRandom(s string) string{
-	if s == ""{
-		return s
+func fuzzInputs(conf Config, seeds []string){
+	inputs := make(chan string)
+	//ouputs := make(chan bool)
+	var wg sync.WaitGroup
+	// fill worker chan
+	go func(){
+		for _, i := range seeds{
+			inputs <- i
+		}
+		close(inputs)
+	}()
+	wg.Add(conf.NumWorkers)
+	for i:=0; i < conf.NumWorkers; i++{
+		go func(){
+			defer wg.Done()
+			work(inputs, conf.Log)
+		}()
 	}
-	letters := strings.Split(s, "")
-	index := rng.Intn(len(letters))
-	copy(letters[index:], letters[index+1:])
-	return strings.Join(letters[:len(letters)-1],"")
+	wg.Wait()
 }
-
-func flipRandom(s string) string{
-	if s == ""{
-		return s
-	}
-	index:= rng.Intn(len(s))
-	mask := 1 << uint(rng.Intn(7))
-	char := rune(int(s[index]) ^ mask)
-	return s[:index] + string(char) + s[index + 1:]
-}
-
-// Another useful mutation is to insert 'magic' values that naturally show up in bugs
-func mutateSeeds(conf Config,seeds []string) []string{
-	if conf.Log{
-		fmt.Println("[Log] --- Begin seed mutation ---")
-	}
-	mutations := []func(string)string{flipRandom, deleteRandom, insertRandomChar}
-	var n string
-	for i := range seeds{
-		for j:=0; j < conf.NumMutations; j++{
-			function := mutations[rng.Intn(len(mutations))]
-			n = function(seeds[i])
-			//flipRandom(seeds[i])
-			if conf.Log{
-				fmt.Printf("[Log] %s --> %s\n", seeds[i], n)
-			}
-			seeds[i] = n
+// unclear how i want to handle flags and inputs
+func work (inputs <- chan string, log bool){
+	for i := range inputs{
+		if log{
+			fmt.Println("[Log] Running with 0x"+ hex.EncodeToString([]byte(i)))
+		}
+		out, err := exec.Command("man", i).Output()
+		if err != nil{
+			// Save this to output file
+			fmt.Printf("Input 0x%s (hex) caused error %s\n", hex.EncodeToString([]byte(i)), err.Error())
+			fmt.Printf("Output was %s\n", out)
 		}
 	}
-	if conf.Log{
-		fmt.Println("[Log] --- Finished seed mutation ---")
-		fmt.Println("[Log] Mutated seeds: ", seeds)
-	}
-	return seeds
-
 }
+

@@ -13,23 +13,23 @@ func nonTerminal(subSet string) []string{
 	return re.FindAllString(subSet, -1)
 }
 
-func generateExpression(Start string, Grammar map[string][]string, Length int, Trials int) string {
+func generateExpression(start string, grammar map[string][]string, length int, trials int) string{
 	trial := 0
-	term := Start
+	term := start
 	for len(nonTerminal(term)) > 0{
 		// Replace a random expression from term with a random expansion from grammar
 		choice := nonTerminal(term)[rng.Intn(len(nonTerminal(term)))]
-		expansions := Grammar[choice]
+		expansions := grammar[choice]
 		// Could be improved by enforcing expansions choice to have < maxLength nonTerminals, instead of current trial and error approach
 		expansionChoice := expansions[rng.Intn(len(expansions))]
 		temp := strings.Replace(term, choice, expansionChoice,1)
 		// Check if temp follows constraints
-		if len(nonTerminal(temp)) <Length{
+		if len(nonTerminal(temp)) <length{
 			term = temp
 			trial = 0
 		}else{
 			trial ++
-			if trial > Trials{
+			if trial > trials{
 				fmt.Println("[ERROR] Reached max trial length")
 				break
 			}
@@ -38,7 +38,7 @@ func generateExpression(Start string, Grammar map[string][]string, Length int, T
 	}
 	return term
 }
-
+// This could be improved with goroutines?
 func generateSeeds(conf Config) []string{
 	if conf.Log{
 		fmt.Println("[Log] --- Generating Seeds ---")

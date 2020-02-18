@@ -12,6 +12,9 @@ type Config struct{
 	Grammar map[string] []string
 	NumMutations int
 	NumSeeds int
+	NumWorkers int
+	Flags string
+
 }
 func loadDefaults() Config{
 	 grammar := map[string][]string{
@@ -22,7 +25,7 @@ func loadDefaults() Config{
 		"<integer>":	{"<digit><integer>", "<digit>"},
 		"<digit>":	{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"},
 	}
-	return Config{true, 10, 100, "<start>", grammar, 3, 5}
+	return Config{true, 10, 100, "<start>", grammar, 3, 5, 5}
 }
 // TODO make this better
 func checkConf(conf Config) (bool, string){
@@ -39,7 +42,10 @@ func checkConf(conf Config) (bool, string){
 	if conf.NumSeeds == 0{
 		return false, "NumMumSeeds not found or 0"
 	}
-	if _, ok := conf.Grammar[conf.Start]; !ok {
+	if conf.NumWorkers == 0{
+		return false, "NumWorkers not found or 0"
+	}
+	if _, ok := conf.Grammar[conf.Start]; !ok{
 		return false, "Start not in grammar"
 	}
 	// TODO: implement something that checks a grammar is valid
