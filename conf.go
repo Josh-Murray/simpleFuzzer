@@ -13,7 +13,7 @@ type Config struct{
 	NumMutations int
 	NumSeeds int
 	NumWorkers int
-	Flags string
+	File string
 
 }
 func loadDefaults() Config{
@@ -25,7 +25,7 @@ func loadDefaults() Config{
 		"<integer>":	{"<digit><integer>", "<digit>"},
 		"<digit>":	{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"},
 	}
-	return Config{true, 10, 100, "<start>", grammar, 3, 5, 5}
+	return Config{true, 10, 100, "<start>", grammar, 3, 5, 5, "man"}
 }
 // TODO make this better
 func checkConf(conf Config) (bool, string){

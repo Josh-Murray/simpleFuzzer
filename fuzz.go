@@ -21,18 +21,18 @@ func fuzzInputs(conf Config, seeds []string){
 	for i:=0; i < conf.NumWorkers; i++{
 		go func(){
 			defer wg.Done()
-			work(inputs, conf.Log)
+			work(conf.File, inputs, conf.Log)
 		}()
 	}
 	wg.Wait()
 }
 // unclear how i want to handle flags and inputs
-func work (inputs <- chan string, log bool){
+func work (file string, inputs <- chan string, log bool){
 	for i := range inputs{
 		if log{
 			fmt.Println("[Log] Running with 0x"+ hex.EncodeToString([]byte(i)))
 		}
-		out, err := exec.Command("man", i).Output()
+		out, err := exec.Command(file, i).Output()
 		if err != nil{
 			// Save this to output file
 			fmt.Printf("Input 0x%s (hex) caused error %s\n", hex.EncodeToString([]byte(i)), err.Error())

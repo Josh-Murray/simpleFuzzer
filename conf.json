@@ -6,6 +6,7 @@
 	"NumMutations" : 3,
 	"NumSeeds" : 5,
 	"NumWorkers" : 5,
+	"File" : "man",
 	"Grammar" : {
 		"<start>":	["<expr>"],
 		"<expr>":	["<term> + <expr>", "<term> - <expr>", "<term>"],
