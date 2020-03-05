@@ -41,23 +41,46 @@ func mutateSeeds(conf Config,seeds []string) []string{
 	if conf.Log{
 		fmt.Println("[Log] --- Begin seed mutation ---")
 	}
-	mutations := []func(string)string{flipRandom, deleteRandom, insertRandomChar}
-	var n string
-	for i := range seeds{
-		for j:=0; j < conf.NumMutations; j++{
-			function := mutations[rng.Intn(len(mutations))]
-			n = function(seeds[i])
-			//flipRandom(seeds[i])
-			if conf.Log{
-				fmt.Printf("[Log] %s --> %s\n", seeds[i], n)
-			}
-			seeds[i] = n
+	inputs := make(chan string)
+	outputs := make(chan string)
+	go func(){
+		for _, i := range seeds{
+			inputs <- i
 		}
+		close(inputs)
+	}()
+	for i:=0; i< conf.NumWorkers; i++{
+		go func(){
+			mwork(conf, inputs, outputs)
+		}()
 	}
+	for i := range seeds{
+		temp := <- outputs
+		seeds[i] = temp
+	}
+	close(outputs)
+
 	if conf.Log{
 		fmt.Println("[Log] --- Finished seed mutation ---")
 		fmt.Println("[Log] Mutated seeds: ", seeds)
 	}
 	return seeds
 
+}
+
+func mwork(conf Config, inputs <- chan string, outputs chan <- string){
+	mutations := []func(string)string{flipRandom, deleteRandom, insertRandomChar}
+	var n string
+	for i := range inputs{
+		str := i
+		for j:=0; j < conf.NumMutations; j++{
+			function := mutations[rng.Intn(len(mutations))]
+			n = function(str)
+			if conf.Log{
+				fmt.Printf("[Log] %s --> %s\n", i, n)
+			}
+		}
+
+		outputs <- str
+	}
 }
