@@ -51,7 +51,7 @@ func mutateSeeds(conf Config,seeds []string) []string{
 	}()
 	for i:=0; i< conf.NumWorkers; i++{
 		go func(){
-			mwork(conf, inputs, outputs)
+			mutateWorker(conf, inputs, outputs)
 		}()
 	}
 	for i := range seeds{
@@ -68,7 +68,7 @@ func mutateSeeds(conf Config,seeds []string) []string{
 
 }
 
-func mwork(conf Config, inputs <- chan string, outputs chan <- string){
+func mutateWorker(conf Config, inputs <- chan string, outputs chan <- string){
 	mutations := []func(string)string{flipRandom, deleteRandom, insertRandomChar}
 	var n string
 	for i := range inputs{

@@ -1,12 +1,12 @@
 {
-	"Log": true,
+	"Log": false,
 	"Trials": 50,
-	"Length": 5,
+	"Length": 8,
 	"Start" : "<start>",
-	"NumMutations" : 3,
-	"NumSeeds" : 5,
-	"NumWorkers" : 5,
-	"File" : "man",
+	"NumMutations" : 5,
+	"NumSeeds" : 10,
+	"NumWorkers" : 10,
+	"File" : "expr",
 	"Grammar" : {
 		"<start>":	["<expr>"],
 		"<expr>":	["<term> + <expr>", "<term> - <expr>", "<term>"],
