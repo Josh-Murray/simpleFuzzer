@@ -16,4 +16,5 @@ Written in golang
 	the fuzzer would re-run interesting cases automatically
 
 - Implment an algorithm that finds the minimum substring that causes a crash
+- replace string mutations with derviation tree mutations
 
